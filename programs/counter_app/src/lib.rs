@@ -21,6 +21,8 @@ pub mod counter_app {
 
     pub fn decrement(ctx: Context<UpdateCounter>) -> Result<()> {
         let counter = &mut ctx.accounts.counter;
+        require!(counter.count > 0, CounterError::Underflow);
+
         counter.count -= 1;
         Ok(())
     }
@@ -34,7 +36,13 @@ pub mod counter_app {
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
-    #[account(init, payer = user, space = 8 + 32 + 8)]
+    #[account(
+        init,
+        payer = user,
+        space = 8 + 32 + 8,
+        seeds = [b"counter", user.key().as_ref()],
+        bump
+    )]
     pub counter: Account<'info, Counter>,
 
     #[account(mut)]
@@ -45,7 +53,12 @@ pub struct Initialize<'info> {
 
 #[derive(Accounts)]
 pub struct UpdateCounter<'info> {
-    #[account(mut, has_one = owner)]
+    #[account(
+        mut,
+        seeds = [b"counter", counter.owner.as_ref()],
+        bump,
+        has_one = owner
+    )]
     pub counter: Account<'info, Counter>,
 
     pub owner: Signer<'info>,
@@ -55,4 +68,10 @@ pub struct UpdateCounter<'info> {
 pub struct Counter {
     pub owner: Pubkey,
     pub count: i64,
+}
+
+#[error_code]
+pub enum CounterError {
+    #[msg("Counter cannot go below zero")]
+    Underflow,
 }
