@@ -22,11 +22,11 @@ This makes the counter deterministic and removes the need for random keypair acc
 
 ## 🛠️ Run locally
 
-```bash
 anchor test
+
+
 📦 Tech Stack
 Rust
 Anchor
 Solana
 TypeScript
-```
