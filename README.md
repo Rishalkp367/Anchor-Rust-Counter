@@ -1,25 +1,32 @@
-# Anchor Rust Counter App
+# Anchor Rust Counter App 🦀⚓
 
-A Solana counter program built with Rust + Anchor.
+A **PDA-based Counter program** built using **Rust + Anchor (Solana)**.
 
-## Features
+![CI](https://github.com/Rishalkp367/Anchor-Rust-Counter/actions/workflows/anchor-ci.yml/badge.svg)
 
-- Initialize a counter
-- Increment
-- Decrement
-- Reset
+## ✨ Features
 
-## Run Locally
+- PDA-based counter account (1 counter per wallet)
+- Initialize / Increment / Decrement / Reset
+- TypeScript tests (`anchor test`)
+- GitHub Actions CI
 
+## 🧠 PDA Design
+
+Counter PDA is derived using:
+
+- seed: `"counter"`
+- wallet pubkey
+
+This makes the counter deterministic and removes the need for random keypair accounts.
+
+## 🛠️ Run locally
+
+```bash
 anchor test
-Deploy to Devnet
-solana config set --url https://api.devnet.solana.com
-anchor deploy
-
-Learnings
-
-Anchor program structure
-
-Accounts & Context
-
-TypeScript testing
+📦 Tech Stack
+Rust
+Anchor
+Solana
+TypeScript
+```
