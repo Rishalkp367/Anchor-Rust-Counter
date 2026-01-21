@@ -1,25 +1,24 @@
-# Anchor Rust Counter App
+# Anchor Rust Counter App 🦀⚓
 
-A Solana counter program built with Rust + Anchor.
+A simple Solana Counter program built using **Rust + Anchor**.
+
+![CI](https://github.com/Rishalkp367/Anchor-Rust-Counter/actions/workflows/anchor-ci.yml/badge.svg)
 
 ## Features
-
-- Initialize a counter
+- Initialize counter
 - Increment
 - Decrement
 - Reset
+- TypeScript tests (`anchor test`)
+- GitHub Actions CI
 
-## Run Locally
-
+## Run locally
+```bash
 anchor test
-Deploy to Devnet
-solana config set --url https://api.devnet.solana.com
-anchor deploy
 
-Learnings
 
-Anchor program structure
-
-Accounts & Context
-
-TypeScript testing
+Tech Stack
+Rust
+Solana
+Anchor
+TypeScript
