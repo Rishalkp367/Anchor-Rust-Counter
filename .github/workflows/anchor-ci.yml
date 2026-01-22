@@ -80,4 +80,4 @@ jobs:
         env:
           ANCHOR_WALLET: /home/runner/.config/solana/id.json
           ANCHOR_PROVIDER_URL: http://127.0.0.1:8899
-        run: anchor test
+        run: anchor test --provider.cluster localnet
