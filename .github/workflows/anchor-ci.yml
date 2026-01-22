@@ -47,6 +47,12 @@ jobs:
           solana-keygen new --no-bip39-passphrase -o ~/.config/solana/id.json
           solana address
 
+      - name: Airdrop SOL to CI wallet
+        run: |
+          solana config set --url https://api.devnet.solana.com
+          solana airdrop 2 || true
+          solana balance
+
       - name: Run Anchor tests
         env:
           ANCHOR_WALLET: /home/runner/.config/solana/id.json
