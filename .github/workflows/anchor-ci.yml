@@ -2,18 +2,22 @@ name: Anchor CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      CARGO_TERM_COLOR: always
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # ---------- Node / Yarn ----------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -23,39 +27,56 @@ jobs:
       - name: Install Yarn deps
         run: yarn install --frozen-lockfile
 
+      # ---------- Rust ----------
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+
+      # Cache Rust builds + registry (huge speedup)
+      - name: Cache Rust (cargo)
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      # ---------- Solana CLI (Agave) ----------
+      - name: Cache Solana CLI (Agave)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/solana
+          key: solana-agave-${{ runner.os }}-stable
 
       - name: Install Solana CLI (Agave)
         run: |
           sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           solana --version
 
+      # ---------- Anchor (AVM) ----------
+      - name: Cache Anchor (AVM)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.avm
+            ~/.cargo/bin/avm
+          key: anchor-avm-${{ runner.os }}-latest
 
       - name: Install Anchor
         run: |
-          cargo install --git https://github.com/coral-xyz/anchor avm --locked
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked || true
           avm install latest
           avm use latest
           anchor --version
 
+      # ---------- Solana keypair for local tests ----------
       - name: Create Solana keypair for CI
         run: |
           mkdir -p ~/.config/solana
           solana-keygen new --no-bip39-passphrase -o ~/.config/solana/id.json
           solana address
 
-      - name: Airdrop SOL to CI wallet
-        run: |
-          solana config set --url https://api.devnet.solana.com
-          solana airdrop 2 || true
-          solana balance
-
-      - name: Run Anchor tests
+      # ---------- Run tests on local validator ----------
+      - name: Run Anchor tests (local validator)
         env:
           ANCHOR_WALLET: /home/runner/.config/solana/id.json
           ANCHOR_PROVIDER_URL: http://127.0.0.1:8899
         run: anchor test
-
